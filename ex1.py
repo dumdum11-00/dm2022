@@ -1,5 +1,41 @@
+import json
 import re
-text = 'I heard so many_good things about this place so I was pretty juiced to try it. I’m from Cali and I heard Shake Shack is comparable to IN-N-OUT and I gotta say, Shake Shake wins hands down. Surprisingly, the line was short and we waited about 10 MIN. to order. I ordered a regular cheeseburger, fries and a black/white shake. So yummerz. I love the location too! It’s in the middle of the city and the view is breathtaking. Definitely one of my favorite places to eat in NYC. I’m from California and I must say, Shake Shack is better than IN-NOUT, all day, err’day. Would I pay $15+ for a burger here? No. But for the price point they are asking for, this is a definite bang for your buck (though for some, the opportunity cost of waiting in line might outweigh the cost savings) Thankfully, I came in before the lunch swarm descended and I ordered a shake shack (the special burger with the patty + fried cheese & portabella topping) and a coffee milk shake. The beef patty was very juicy and snugly packed within a soft potato roll. On the downside, I could do without the fried portabella-thingy, as the crispy taste conflicted with the juicy, tender burger. How does shake shack compare with in-andout or 5-guys? I say a very close tie, and I think it comes down to personal affliations. On the shake side, true to its name, the shake was well churned and very thick and luscious. The coffee flavor added a tangy taste and complemented the vanilla shake well.'
-res = re.sub('[^A-Za-z0-9]+', ' ', text).lower().split()
-cnt = dict(zip(list(res),[list(res).count(i) for i in list(res)])) 
-print(cnt)
+import math
+
+def clean_up(input):
+    res = re.sub('[^A-Za-z0-9]+', ' ', input).lower().split()
+    return res
+
+def co_oc(input):
+    # another way but worse
+    # cnt = dict(zip(list(res),[list(res).count(i) for i in list(res)])) 
+    cnt = {i:input.count(i) for i in input}
+    return cnt
+
+def cal_TF(input):
+    cnt = {i:input.count(i)/len(input) for i in input}
+    return cnt
+
+def cal_IDF(input):
+    cnt = {i:math.log(len(input)/(input.count(i)/len(input))) for i in input}
+    return cnt
+
+# print(count_co(clean_up(data[0])))
+
+data_file = open("../yelp_academic_dataset_review.json")
+data = []
+
+for line in data_file:
+    data.append(json.loads(line)['text'])
+    if len(data) == 100:
+        untrashtify = clean_up(data[0])
+        print( co_oc(untrashtify))
+        print("\n")
+        print( cal_TF(untrashtify))
+        print("\n")
+        print( cal_IDF(untrashtify))
+        break
+data_file.close()
+
+
+
