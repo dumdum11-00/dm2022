@@ -4,40 +4,52 @@ import re
 import math
 import pprint
 
-def clean_up(input):
-    res = re.sub('[^A-Za-z0-9]+', ' ', input).lower().split()
-    return res
 
-def cal_distance(input):
-    result=[]
-    for word in input:
-        res = {word:{i:abs(len(i)- input[word])for i in input}}
-  
-        result.append(res)
+def line_len(input):
+    result = {}
+    i = 0
+    for line in input:
+        result[i] = (len(line))
+        i +=1
     return result
 
-def co_word(input):
-    res = {i:len(i) for i in input}
-    return res
+def cal_dis(input):
+    disttance_mat= []
+    for x in input.keys():
+        res = {x:{i:abs(input[i]- input[x])for i, val in input.items() if i != x}}
+        disttance_mat.append(res)
 
-def co_oc(input):
-    # another way but worse
-    # cnt = dict(zip(list(res),[list(res).count(i) for i in list(res)])) 
-    cnt = {i:input.count(i) for i in input}
-    return cnt
 
-# print(count_co(clean_up(data[0])))
+    pp = pprint.PrettyPrinter(width=41, compact=True)
+    pp.pprint(disttance_mat)  
+    return disttance_mat
+
+def get_min_dis(input):
+    result= []
+    for matrix in input:
+        for x, y in matrix.items():
+            result.append(min(matrix[x], key=matrix[x].get))
+    
+    return result
+
+
+# TODO: Add function for point merge
 
 data_file = open("../yelp_academic_dataset_review.json")
 data = []
 
+limit = 10
+
+
 for line in data_file:
     data.append(json.loads(line)['text'])
-    if len(data) == 100:
-        untrashtify = clean_up(data[0])
-        char_count= co_word(untrashtify)
-        pp = pprint.PrettyPrinter(width=41, compact=True)
-        pp.pprint(cal_distance(char_count))
+    if len(data) == limit:
+        res = line_len(data)
+        print(res)
+
+        a = cal_dis(res)
+
+        print(get_min_dis(a))
         break
 data_file.close()
 
